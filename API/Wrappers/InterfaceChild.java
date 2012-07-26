@@ -21,8 +21,8 @@ import com.Marneus.Enviroment.Hook.ClassHook;
 public class InterfaceChild {
 	public Object currentObject;
 	public ClassHook currentHook;
-	public Interface parentInterface;//Top level parent
-	public InterfaceChild parentInterfaceChild;//Standard component parent
+	public Interface parentInterface;
+	public InterfaceChild parentInterfaceChild;
 	public int index;
 	public InterfaceChild getParentInterfaceChild(){
 		return parentInterfaceChild;
@@ -43,22 +43,26 @@ public class InterfaceChild {
 		currentHook = Data.indentifiedClasses.get("InterfaceChild");
 	}
 	public Point getAbsoluteLocation() {
-		final int parentId = getParentId();
+		int parentId = getParentID();
 		int x = 0, y = 0;
 		if (parentId != -1) {
-			final Point point = Client.getInterfaceHolder()[parentId >> 0x10].getChildren()[parentId & 0xffff].getAbsoluteLocation();
-			x = point.x;
-			y = point.y;
-		} else {
-			final Rectangle[] bounds = Client.getInterfaceBoundsArray();
-			final int index = getBoundsArrayIndex();
+			InterfaceChild child = Interfaces.getChild(parentId);
+			Point p = child.getAbsoluteLocation();
+			x+=p.x;
+			y+=p.y;
+		} 
+		else {
+			Rectangle[] bounds = Client.getInterfaceBoundsArray();
+			int index = getBoundsArrayIndex();
 			if (bounds != null && index > 0 && index < bounds.length && bounds[index] != null) {
-				return new Point(bounds[index].x, bounds[index].y);
+				x+=bounds[index].x;
+				y+=bounds[index].y;
 			}
+			
 		}
 		if (parentId != -1) {
 			InterfaceChild child = Interfaces.getChild(parentId);
-			final int h = child.getHorizontalScrollbarSize(), v = child.getVerticalScrollbarSize();
+			int h = child.getHorizontalScrollbarSize(), v = child.getVerticalScrollbarSize();
 			if (v > 0 || h > 0) {
 				x -= child.getHorizontalScrollbarPosition();
 				y -= child.getVerticalScrollbarPosition();
@@ -69,32 +73,10 @@ public class InterfaceChild {
 		return new Point(x, y);
 	}
 	public int getAbsoluteX() {
-		int x = 0;//define x
-		if(parentInterfaceChild==null){
-			int idx = getBoundsArrayIndex();
-			if(idx!=-1){
-				x+=Client.getInterfaceBoundsArray()[idx].x;
-			}
-		}
-		else{
-			x+=parentInterfaceChild.getAbsoluteX();
-		}
-		x+=getRelativeX();
-		return x;
+		return getAbsoluteLocation().x;
 	}
 	public int getAbsoluteY(){
-		int y = 0;//define x
-		if(parentInterfaceChild==null){
-			int idx = getBoundsArrayIndex();
-			if(idx!=-1){
-				y+=Client.getInterfaceBoundsArray()[idx].y;
-			}
-		}
-		else{
-			y+=parentInterfaceChild.getAbsoluteY();
-		}
-		y+=getRelativeY();
-		return y;
+		return getAbsoluteLocation().y;
 	}
 	public int getRelativeX(){
 		Object data = currentHook.getData("getRelativeX", currentObject);
@@ -132,23 +114,24 @@ public class InterfaceChild {
 			return Integer.parseInt(data.toString()) * currentHook.getFieldHook("getTextureID").getMultiplier();
 		return -1;
 	}
-	public int getParentId() {
-		int parentId = getParentID();
-		if (parentId != -1) {
-			return parentId;
-		}
-		final int mainID = getID() >>> 0x10;
-		for (InterfaceNode node = Client.getInterfaceNodeCache(); node != null; node = new InterfaceNode(node.getNode().getNext())) {
-			if (mainID == node.getMainID()) {
-				return (int) node.getMainID();
+	public int getParentId(){
+		int mainID = getID() >>> 16;
+		HashTable nc = Client.getInterfaceNodeCache();
+		for(Node n : nc.getBuckets()){
+			InterfaceNode ic = new InterfaceNode(n.currentObject);
+			if(mainID == ic.getMainID()){
+				return (int)(n.getID());
 			}
 		}
 		return -1;
 	}
 	public int getParentID(){
 		Object data = currentHook.getData("getParentID", currentObject);
-		if(data!=null)
-			return Integer.parseInt(data.toString()) * currentHook.getFieldHook("getParentID").getMultiplier();
+		if(data!=null){
+			int id = Integer.parseInt(data.toString()) * currentHook.getFieldHook("getParentID").getMultiplier();
+			if(id!=-1)
+				return id;
+		}
 		return -1;
 	}
 	public int getComponentID(){
