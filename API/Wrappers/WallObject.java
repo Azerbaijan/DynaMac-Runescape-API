@@ -36,6 +36,12 @@ public class WallObject {
 	}
 	private int locX;
 	private int locY;
+	public int getID(){
+		Object data = currentHook.getData("getID", currentObject);
+		if(data!=null)
+			return Integer.parseInt(data.toString()) * currentHook.getFieldHook("getID").getMultiplier();		
+		return -1;		
+	}
 	public ModelLD getLDModel(){
 		for(FieldHook fh : currentHook.getFieldHooks()){
 			if(fh.getRefactoredName().equals("getModel")){
