@@ -13,10 +13,11 @@ import java.awt.Rectangle;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import com.Marneus.Bot.API.Wrappers.HashTable;
 import com.Marneus.Bot.API.Wrappers.Info;
 import com.Marneus.Bot.API.Wrappers.Interface;
-import com.Marneus.Bot.API.Wrappers.InterfaceNode;
 import com.Marneus.Bot.API.Wrappers.NPCNode;
+import com.Marneus.Bot.API.Wrappers.ObjectDefLoader;
 import com.Marneus.Bot.API.Wrappers.Player;
 import com.Marneus.Bot.API.Wrappers.RenderLD;
 import com.Marneus.Enviroment.Data;
@@ -150,13 +151,13 @@ public class Client {
 		}
 		return new Interface[]{};
 	}
-	public static InterfaceNode getInterfaceNodeCache(){
+	public static HashTable getInterfaceNodeCache(){
 		try{
 			ClassHook ch = Data.indentifiedClasses.get("Client");
 			if(ch!=null && ch.containsFieldHook("getInterfaceNodeCache")){
 				Object data = ch.getData("getInterfaceNodeCache");
 				if(data!=null){
-					return new InterfaceNode(data);
+					return new HashTable(data);
 				}
 			}
 		}
@@ -336,6 +337,16 @@ public class Client {
 		catch(Exception e){
 		}
 		return new NPCNode[]{};
+	}
+	public static ObjectDefLoader getObjectDefLoader(){
+		for(ClassHook ch : Data.indentifiedClasses.values()){
+			if(ch!=null && ch.containsFieldHook("getObjectDefLoader")){
+				Object o = ch.getData("getObjectDefLoader");
+				if(o!=null)
+					return new ObjectDefLoader(o);
+			}
+		}
+		return null;
 	}
 	public static String getPassword(){
 		try{
