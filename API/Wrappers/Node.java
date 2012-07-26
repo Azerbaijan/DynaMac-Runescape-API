@@ -19,10 +19,11 @@ public class Node {
 		currentObject = o;
 		currentHook = Data.indentifiedClasses.get("Node");
 	}
-	public int getID(){
+	public long getID(){
 		Object data = currentHook.getData("getID", currentObject);
-		if(data!=null)
-			return Integer.parseInt(data.toString());			
+		if(data!=null){
+			return Long.parseLong(data.toString()) * currentHook.getFieldHook("getID").getLongMultiplier();
+		}
 		return -1;
 	}
 	public Node getPrevious(){
