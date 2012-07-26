@@ -1,16 +1,17 @@
 /******************************************************
-* Created by Marneus901                                *
-* © 2012 MarneusScripts.com                            *
-* **************************************************** *
-* Access to this source is unauthorized without prior  *
-* authorization from its appropriate author(s).        *
-* You are not permitted to release, nor distribute this* 
-* work without appropriate author(s) authorization.    *
-********************************************************/
+ * Created by Marneus901                                *
+ * © 2012 MarneusScripts.com                            *
+ * **************************************************** *
+ * Access to this source is unauthorized without prior  *
+ * authorization from its appropriate author(s).        *
+ * You are not permitted to release, nor distribute this* 
+ * work without appropriate author(s) authorization.    *
+ ********************************************************/
 package com.Marneus.Bot.API.Wrappers;
 
 import com.Marneus.Bot.API.Methods.Calculations;
 import com.Marneus.Bot.API.Methods.Client;
+import com.Marneus.Bot.API.Methods.Nodes;
 import com.Marneus.Enviroment.Data;
 import com.Marneus.Enviroment.Hook.ClassHook;
 import com.Marneus.Enviroment.Hook.ClassHook.FieldHook;
@@ -27,6 +28,12 @@ public class AnimableObject {
 	}
 	public Animable getAnimable(){
 		return new Animable(currentObject);
+	}
+	public int getID(){
+		Object data = currentHook.getData("getID", currentObject);
+		if(data!=null)
+			return Integer.parseInt(data.toString()) * currentHook.getFieldHook("getID").getMultiplier();		
+		return -1;		
 	}
 	public int getLocationX(){
 		try{
@@ -62,23 +69,41 @@ public class AnimableObject {
 			return -1;
 		}
 	}
-	public ObjectDefLoader getObjectDefLoader(){
-		for(FieldHook fh : currentHook.getFieldHooks()){
-			if(fh.getRefactoredName().equals("getObjectDefLoader")){
-				Object data = fh.getData(currentObject);
-				if(data!=null)
-					return new ObjectDefLoader(data);
+	public ObjectDef getObjectDef(){
+		try{
+			Node ref = Nodes.lookup(Client.getObjectDefLoader().getCache().getTable(), (long)getID());
+			if (ref.currentHook.getClassName().equals(Data.indentifiedClasses.get("HardReference").getClassName())) {
+				HardReference hr = new HardReference(ref.currentObject);
+				return new ObjectDef(hr.getHardReference());
+			} 
+			else if (ref.currentHook.getClassName().equals(Data.indentifiedClasses.get("SoftReference").getClassName())) {
+				SoftReference sr = new SoftReference(ref.currentObject);
+				Object def = sr.getReference().currentObject;
+				if (def != null) {
+					return new ObjectDef(def);
+				}
 			}
-		}		
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public ObjectDefLoader getObjectDefLoader(){
+		FieldHook fh = currentHook.getFieldHook("getObjectDefLoader");
+		if(fh!=null){
+			Object data = fh.getData(currentObject);
+			if(data!=null)
+				return new ObjectDefLoader(data);
+		}
 		return null;
 	}
 	public ModelLD getLDModel(){
-		for(FieldHook fh : currentHook.getFieldHooks()){
-			if(fh.getRefactoredName().equals("getModel")){
-				Object data = fh.getData(currentObject);
-				if(data!=null)
-					return new ModelLD(data);
-			}
+		FieldHook fh = currentHook.getFieldHook("getModel");
+		if(fh!=null){
+			Object data = fh.getData(currentObject);
+			if(data!=null)
+				return new ModelLD(data);
 		}		
 		return null;
 	}	
@@ -110,11 +135,11 @@ public class AnimableObject {
 			int vertexX = (int) (model.getVerticiesX()[index] + locX);
 			int vertexY = model.getVerticiesY()[index] + height;
 			int vertexZ = (int) (model.getVerticiesZ()[index] + locY);
-			
+
 			float _z = (zOff + (zX * vertexX + zY * vertexY + zZ * vertexZ));
 			float _x = (xOff + (xX * vertexX + xY * vertexY + xZ * vertexZ));
 			float _y = (yOff + (yX * vertexX + yY * vertexY + yZ * vertexZ));
-			
+
 			float fx = ((float)256.0 + ((float)256.0 * _x) / _z);
 			float fy = ((float)166.0 + ((float)167.0 * _y) / _z);
 			if(fx<520 && fx>0 && fy<390 && fy>50){
