@@ -15,6 +15,9 @@ import com.Marneus.Enviroment.Hook.ClassHook;
 public class NPC {
 	private Object currentObject;
 	private ClassHook currentHook;
+	public int getAnimation(){
+		return getCharacter().getAnimationID();
+	}
 	public int getLevel(){
 		Object data = currentHook.getData("getLevel", currentObject);
 		if(data!=null){
