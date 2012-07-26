@@ -34,6 +34,21 @@ public class Calculations {
 		}
 		return new Point(-1, -1);
 	}
+	public static Point locationToScreen(int x, int y, int height){
+		x = x-Client.getRSData().getBaseInfo().getX();
+		y = y-Client.getRSData().getBaseInfo().getY();
+		return groundToScreen((int) ((x + 0.5) * 512), (int) ((y + 0.5) * 512), height);
+	}
+	public static Point groundToScreen(int x, int y, int height) {
+		try{
+			int z = tileHeight(x, y)+height;
+			return worldToScreen(x, z, y);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return new Point(-1, -1);
+	}
 	public static Point locationToScreen(int x, int y){
 		x = x-Client.getRSData().getBaseInfo().getX();
 		y = y-Client.getRSData().getBaseInfo().getY();
