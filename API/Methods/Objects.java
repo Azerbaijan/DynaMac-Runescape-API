@@ -180,4 +180,17 @@ public class Objects {
 		}
 		return new Object[]{};
 	}
+	public Object getObjectByID(int id){
+		for(Object o : getAllObjects()){
+			if(o instanceof AnimableObject && ((AnimableObject) o).getID()==id)
+				return o;
+			if(o instanceof WallObject && ((WallObject) o).getID()==id)
+				return o;
+			if(o instanceof FloorObject && ((FloorObject) o).getID()==id)
+				return o;
+			if(o instanceof BoundaryObject && ((BoundaryObject) o).getID()==id)
+				return o;
+		}
+		return null;
+	}
 }
