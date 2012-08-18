@@ -1,6 +1,6 @@
 /******************************************************
 * Created by Marneus901                                *
-* © 2012 MarneusScripts.com                            *
+* ï¿½ 2012 MarneusScripts.com                            *
 * **************************************************** *
 * Access to this source is unauthorized without prior  *
 * authorization from its appropriate author(s).        *
@@ -13,22 +13,19 @@ import com.Marneus.Enviroment.Data;
 import com.Marneus.Enviroment.Hook.ClassHook;
 
 public class ItemDefLoader {
-	public Object currentObject;
-	public ClassHook currentHook;
-	public ItemDefLoader(Object o){
+	public final Object currentObject;
+	public final ClassHook currentHook;
+	
+	public ItemDefLoader(final Object o){
 		currentObject = o;
 		currentHook = Data.indentifiedClasses.get("ItemDefLoader");
 	}
 	public boolean isMembers(){
-		Object data = currentHook.getData("isMembers", currentObject);
-		if(data!=null)
-			return Boolean.parseBoolean(data.toString());		
-		return false;
+		final Object data = currentHook.getData("isMembers", currentObject);
+		return data!=null ? Boolean.parseBoolean(data.toString()) : false;	
 	}
 	public Cache getCache(){
-		Object data = currentHook.getData("getCache", currentObject);
-		if(data!=null)
-			return new Cache(data);		
-		return null;
+		final Object data = currentHook.getData("getCache", currentObject);
+		return data!=null ? new Cache(data) : null;
 	}
 }
